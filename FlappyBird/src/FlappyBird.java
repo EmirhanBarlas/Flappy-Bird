@@ -7,68 +7,59 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import javax.swing.ImageIcon;
 
 class Bird {
     int x, y, velocity;
-
     public Bird() {
         x = 50;
         y = 200;
         velocity = 0;
     }
-
     public void jump() {
         velocity = -10;
     }
-
     public void move() {
         velocity += 1;
         y += velocity;
     }
 }
-
 class Pipe {
     int x, height, gap, speed;
-
     public Pipe(int x) {
         this.x = x;
         height = new Random().nextInt(200) + 50;
         gap = 150;
         speed = 5;
     }
-
     public void move() {
         x -= speed;
     }
-
     public boolean isOutOfScreen() {
         return x < -50;
     }
-
     public boolean isColliding(Bird bird) {
         return bird.x + 30 > x && bird.x < x + 50 && (bird.y < height || bird.y + 30 > height + gap);
     }
 }
-
 class FlappyPanel extends JPanel implements ActionListener, KeyListener {
     private Bird bird;
     private List<Pipe> pipes;
     private Timer timer;
     private boolean gameRunning;
     private int score;
-
+    private Image backgroundImage;
     public FlappyPanel() {
         bird = new Bird();
         pipes = new ArrayList<>();
         gameRunning = false;
         score = 0;
-
         timer = new Timer(20, this);
         timer.start();
-
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
+        backgroundImage = new ImageIcon("src/background.jpg").getImage();
     }
 
     private void resetGame() {
@@ -93,9 +84,9 @@ class FlappyPanel extends JPanel implements ActionListener, KeyListener {
             for (Pipe pipe : pipes) {
                 pipe.move();
                 if (pipe.isOutOfScreen()) {
-                    pipe.x += 600; // Move the pipe to the right side
-                    pipe.height = new Random().nextInt(200) + 50; // Randomize the pipe height
-                    score++; // Her boru geçişinde skoru arttır
+                    pipe.x += 600;
+                    pipe.height = new Random().nextInt(200) + 50;
+                    score++;
                 }
 
                 if (pipe.isColliding(bird)) {
@@ -114,6 +105,7 @@ class FlappyPanel extends JPanel implements ActionListener, KeyListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
 
         g.setColor(Color.CYAN);
         g.fillRect(bird.x, bird.y, 30, 30);
@@ -125,18 +117,18 @@ class FlappyPanel extends JPanel implements ActionListener, KeyListener {
         }
 
         if (!gameRunning) {
-            g.setColor(Color.RED);
-            g.setFont(new Font("Arial", Font.BOLD, 40));
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 50));
             FontMetrics metrics = g.getFontMetrics();
-            int x = (getWidth() - metrics.stringWidth("Game Over")) / 2;
+            int x = (getWidth() - metrics.stringWidth("OYUNU KAYBETTİN EŞEK OYNAMA DAHA")) / 2;
             int y = getHeight() / 2;
-            g.drawString("Game Over", x, y);
+            g.drawString("Oyunu Oynamak İçin SPACE", x, y);
         }
 
         // Skor kısmını çiz
-        g.setColor(Color.BLACK);
+        g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString("Score: " + score, getWidth() - 100, 30);
+        g.drawString("Skorun LA GARDAS: " + score, getWidth() - 250, 30);
     }
 
     public void jump() {
@@ -164,22 +156,23 @@ class FlappyPanel extends JPanel implements ActionListener, KeyListener {
 
 public class FlappyBird extends JFrame {
     public FlappyBird() {
-        setTitle("Flappy Bird");
-        setSize(400, 400);
+        setTitle("Flappy Bird Gardas");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setUndecorated(true);
+        setUndecorated(false);
+        setResizable(true);
         setLocationRelativeTo(null);
 
         FlappyPanel flappyPanel = new FlappyPanel();
         add(flappyPanel);
 
         pack();
+        setSize(400, 400);
+        setVisible(true);
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            FlappyBird game = new FlappyBird();
-            game.setVisible(true);
+            new FlappyBird();
         });
     }
 }
